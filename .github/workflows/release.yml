@@ -54,4 +54,4 @@ jobs:
         with:
           files: dist/UndyingOverlay.exe # Specify the files to upload to the release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret automatically
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} # GitHub provides this secret automatically
