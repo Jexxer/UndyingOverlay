@@ -36,7 +36,7 @@ jobs:
         with:
           name: executable
           path: dist/
-          compression-level: none
+          compression-level: 0
 
       - name: List files in dist
         run: ls dist/
