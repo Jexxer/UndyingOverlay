@@ -28,7 +28,7 @@ jobs:
       # Build the executable with PyInstaller
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed overlay.py
+          pyinstaller --onefile --windowed --name UndyingOverlay.exe overlay.py
 
       # Upload the build artifact
       - name: Upload build artifact
@@ -42,7 +42,7 @@ jobs:
 
   release:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       # Check out the repository
       - name: Checkout repository
@@ -52,6 +52,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/* # Specify the files to upload to the release
+          files: dist/UndyingOverlay.exe # Specify the files to upload to the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret automatically
