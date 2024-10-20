@@ -36,7 +36,6 @@ jobs:
         with:
           name: executable
           path: dist/
-          compression-level: 0
 
       - name: List files in dist
         run: ls dist/
@@ -53,6 +52,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/UndyingOverlay.exe # Specify the files to upload to the release
+          files: dist/*.zip # Specify the files to upload to the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret automatically
