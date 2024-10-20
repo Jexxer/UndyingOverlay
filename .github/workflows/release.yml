@@ -1,4 +1,3 @@
-# Example GitHub Actions workflow
 name: Build and Release Python Executable
 
 on:
@@ -11,27 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the repository
+      # Check out the repository with Node.js v16 or v20 support
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.x" # Use Python 3.x (set to your version)
+          python-version: "3.11.9"
 
-      # Install dependencies (if you have any)
+      # Install dependencies
       - name: Install dependencies
         run: |
           pip install pyinstaller
 
-      # Build the executable
+      # Build the executable with PyInstaller
       - name: Build executable with PyInstaller
         run: |
           pyinstaller --onefile --windowed overlay.py
 
-      # Upload the build artifact with v4
+      # Upload the build artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -44,12 +43,12 @@ jobs:
     steps:
       # Check out the repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      # Upload the executable to the release using v4
-      - name: Upload release
-        uses: actions/upload-artifact@v4
+      # Upload the executable to the release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          files: dist/* # Upload all files in the dist/ directory
+          files: dist/overlay.exe # Specify the files to upload to the release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret automatically
