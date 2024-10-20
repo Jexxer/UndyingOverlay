@@ -66,7 +66,7 @@ class Overlay(QWidget):
         print("Timer is being reset...")
         self.time_left = 0
         self.timer.stop()
-        self.label.setText("Relic Power Restored")
+        self.label.setText("Undying Ready")
 
     def update_countdown(self):
         if self.time_left > 0:
@@ -76,7 +76,7 @@ class Overlay(QWidget):
             self.label.setText(f"Undying cooldown: {minutes}:{seconds:02d}")
         else:
             self.timer.stop()
-            self.label.setText("Relic Power Restored")
+            self.label.setText("Undying Ready")
 
     # Mouse press event for dragging and right-click termination
     def mousePressEvent(self, event):
