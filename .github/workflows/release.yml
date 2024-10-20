@@ -1,0 +1,54 @@
+name: Build and Release Python Executable
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers the workflow on version tags like v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x" # Use Python 3.x (set to your version)
+
+      # Install dependencies (if you have any)
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller
+
+      # Build the executable
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller --onefile --windowed overlay.py
+
+      # Archive the build output
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: executable
+          path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Upload the executable to the release
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/* # Upload all files in the dist/ directory
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
