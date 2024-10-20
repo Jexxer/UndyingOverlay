@@ -15,12 +15,14 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-# The string to detect
+# The string to detect for starting and resetting the cooldown
 TARGET_STRING = "Your Undying Retribution Relic saves your life. The Relic has lost power for 3 minutes."
+RESET_STRING = "Your Undying Retribution relic is now ready."  # String that resets the cooldown
 
 
 class Overlay(QWidget):
     start_timer_signal = pyqtSignal(int)  # Signal to start the timer from another thread
+    reset_timer_signal = pyqtSignal()     # Signal to reset the timer from another thread
 
     def __init__(self):
         super().__init__()
@@ -46,20 +48,25 @@ class Overlay(QWidget):
         self.is_dragging = False
         self.drag_start_position = QPoint()
 
-        # Connect the signal to the slot that starts the countdown
+        # Connect the signals to their respective slots
         self.start_timer_signal.connect(self.start_countdown)
+        self.reset_timer_signal.connect(self.reset_countdown)
 
     def start_countdown(self, duration):
         current_time = datetime.datetime.now()
 
-        # If no timer was set before, or if 3 minutes have passed since the last trigger
-        if self.last_triggered is None or (current_time - self.last_triggered).total_seconds() >= 180:
-            self.time_left = duration
-            self.last_triggered = current_time
-            self.label.setText(f"Undying cooldown: {self.time_left // 60}:{self.time_left % 60:02d}")
-            self.timer.start(1000)  # Update every second
-        else:
-            print("Timer is already running, ignoring duplicate message.")
+        # Always reset and start the timer, even if it's already running
+        self.time_left = duration
+        self.last_triggered = current_time
+        self.label.setText(f"Undying cooldown: {self.time_left // 60}:{self.time_left % 60:02d}")
+        self.timer.start(1000)  # Update every second
+
+    def reset_countdown(self):
+        # Immediately reset the countdown timer
+        print("Timer is being reset...")
+        self.time_left = 0
+        self.timer.stop()
+        self.label.setText("Relic Power Restored")
 
     def update_countdown(self):
         if self.time_left > 0:
@@ -163,6 +170,10 @@ def monitor_log_file(file_path, overlay):
                 if TARGET_STRING in line:
                     # Emit signal to start the timer in the main thread
                     overlay.start_timer_signal.emit(180)  # 3-minute countdown
+                elif RESET_STRING in line:
+                    # Emit signal to reset the timer in the main thread
+                    print("Resetting cooldown due to relic reset message.")
+                    overlay.reset_timer_signal.emit()  # Use signal to reset timer
             time.sleep(0.1)  # Small delay to prevent CPU overuse
 
 
