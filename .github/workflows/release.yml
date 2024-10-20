@@ -36,6 +36,7 @@ jobs:
         with:
           name: executable
           path: dist/UndyingOverlay.exe
+          compression-level: 0
 
       - name: List files in dist
         run: ls dist/
