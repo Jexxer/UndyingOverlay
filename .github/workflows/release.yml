@@ -53,6 +53,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/UndyingOverlay.exe # Specify the files to upload to the release
+          files: UndyingOverlay.exe # Specify the files to upload to the release
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} # GitHub provides this secret automatically
