@@ -36,23 +36,23 @@ jobs:
         with:
           name: executable
           path: dist/UndyingOverlay.exe
-          compression-level: 0
+          # compression-level: 0
 
-      - name: List files in dist
-        run: ls dist/
+      # - name: List files in dist
+      #   run: ls dist/
 
-  release:
-    needs: build
-    runs-on: windows-latest
-    steps:
-      # Check out the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  # release:
+  #   needs: build
+  #   runs-on: windows-latest
+  #   steps:
+  #     # Check out the repository
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      # Upload the executable to the release
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: UndyingOverlay.exe # Specify the files to upload to the release
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} # GitHub provides this secret automatically
+  #     # Upload the executable to the release
+  #     - name: Create GitHub Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: UndyingOverlay.exe # Specify the files to upload to the release
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} # GitHub provides this secret automatically
