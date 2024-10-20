@@ -1,3 +1,4 @@
+# Example GitHub Actions workflow
 name: Build and Release Python Executable
 
 on:
@@ -30,9 +31,9 @@ jobs:
         run: |
           pyinstaller --onefile --windowed overlay.py
 
-      # Archive the build output
+      # Upload the build artifact with v4
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: executable
           path: dist/
@@ -45,9 +46,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Upload the executable to the release
+      # Upload the executable to the release using v4
       - name: Upload release
-        uses: softprops/action-gh-release@v1
+        uses: actions/upload-artifact@v4
         with:
           files: dist/* # Upload all files in the dist/ directory
         env:
