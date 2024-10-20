@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: executable
-          path: dist/
+          path: dist/UndyingOverlay.exe
 
       - name: List files in dist
         run: ls dist/
@@ -52,6 +52,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*.zip # Specify the files to upload to the release
+          files: dist/UndyingOverlay.exe # Specify the files to upload to the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this secret automatically
