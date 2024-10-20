@@ -13,9 +13,10 @@
 
 To make **UndyingOverlay** work, you need the following:
 
-1. **Python**: The project is built using Python 3.x, so you need to have Python installed on your system.
-2. **Chat Logger Plugin**: Ensure that the game is logging chat messages. The **Chat Logger** plugin must be installed and enabled in your game.
-3. **Game Chat Checkbox**: Make sure the **Game Chat** checkbox is enabled to allow the overlay to detect relevant messages from the chat log.
+<!-- 1. **Python**: The project is built using Python 3.x, so you need to have Python installed on your system. -->
+
+1. **Chat Logger Plugin**: Ensure that the game is logging chat messages. The **Chat Logger** plugin must be installed and enabled in your game.
+2. **Game Chat Checkbox**: Make sure the **Game Chat** checkbox is enabled to allow the overlay to detect relevant messages from the chat log.
 
 ## Installation
 
