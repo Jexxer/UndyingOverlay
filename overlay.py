@@ -107,11 +107,11 @@ class Overlay(QWidget):
     def update_label(self, text=None):
         if text:
             # Set color to limegreen when showing "Ready"
-            self.text_label.setStyleSheet("color: limegreen; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 1px black;")
+            self.text_label.setStyleSheet("color: limegreen; font-size: 18px; font-weight: bold; text-shadow: 1px 1px 1px black;")
             self.text_label.setText(text)
         else:
             # Set color to white during countdown
-            self.text_label.setStyleSheet("color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 1px black;")
+            self.text_label.setStyleSheet("color: white; font-size: 18px; font-weight: bold; text-shadow: 1px 1px 1px black;")
             minutes = self.time_left // 60
             seconds = self.time_left % 60
             self.text_label.setText(f"{minutes}:{seconds:02d}")
