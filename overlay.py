@@ -5,10 +5,12 @@ import threading
 import time
 
 from PyQt5.QtCore import QPoint, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QPixmap
 from PyQt5.QtWidgets import (
     QApplication,
     QComboBox,
     QDialog,
+    QGraphicsDropShadowEffect,
     QLabel,
     QPushButton,
     QVBoxLayout,
@@ -28,21 +30,38 @@ class Overlay(QWidget):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.X11BypassWindowManagerHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setGeometry(52, 20, 150, 60)
-        self.layout = QVBoxLayout()
+        self.setGeometry(52, 20, 150, 150)  # Adjust size
 
-        # Add a background with transparency
-        self.setStyleSheet("background-color: rgba(0, 0, 0, 150); border: 1px solid white;")
+        # Use absolute positioning to overlap text and image
+        self.image_label = QLabel("Ready", self)
+        self.image_label.setGeometry(0, 0, 68, 68)  # Set the size of the image label
+        pixmap = QPixmap("undyingimg.png")  # Replace with the actual path to the rune image
+        self.image_label.setPixmap(pixmap)
+        self.image_label.setScaledContents(True)
+        self.image_label.setStyleSheet("background-color: rgba(79, 75, 71, 170); border: 4px solid #40372F; border-radius: 4px;")
+        
 
-        self.label = QLabel("Undying Ready")
-        self.label.setStyleSheet("QLabel { color: white; font-size: 24px; }")  # White text for readability
-        self.layout.addWidget(self.label)
+        # Text label that will appear on top of the image
+        self.text_label = QLabel("Ready", self)
+        self.text_label.setGeometry(0, 28, 68, 45)  # Position the text at the bottom part of the image
+        self.text_label.setStyleSheet("""
+            color: limegreen;
+            font-size: 18px;
+            font-weight: bold;
+        """)
+        
+        # Apply drop shadow to simulate text outline
+        self.apply_text_shadow(self.text_label)
+        
+        # align text to center
+        self.text_label.setAlignment(Qt.AlignCenter)  # Center the text
+        self.image_label.stackUnder(self.text_label)
 
-        self.setLayout(self.layout)
+        # Timer settings
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_countdown)
         self.time_left = 0
-        self.last_triggered = None  # Track the last time the message was detected
+        self.last_triggered = None
 
         # Variables for dragging
         self.is_dragging = False
@@ -51,32 +70,43 @@ class Overlay(QWidget):
         # Connect the signals to their respective slots
         self.start_timer_signal.connect(self.start_countdown)
         self.reset_timer_signal.connect(self.reset_countdown)
+        
+    def apply_text_shadow(self, label):
+        """Applies a shadow effect to the text, simulating an outline."""
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(5)
+        shadow.setOffset(0, 0)  # No offset for a centered outline
+        shadow.setColor(QColor(0, 0, 0))  # Black shadow
+        label.setGraphicsEffect(shadow)
 
     def start_countdown(self, duration):
-        current_time = datetime.datetime.now()
-
-        # Always reset and start the timer, even if it's already running
         self.time_left = duration
-        self.last_triggered = current_time
-        self.label.setText(f"Undying cooldown: {self.time_left // 60}:{self.time_left % 60:02d}")
-        self.timer.start(1000)  # Update every second
+        self.timer.start(1000)
+        self.update_label()
 
     def reset_countdown(self):
-        # Immediately reset the countdown timer
-        print("Timer is being reset...")
         self.time_left = 0
         self.timer.stop()
-        self.label.setText("Undying Ready")
+        self.update_label("Ready")  # Reset to "Ready"
 
     def update_countdown(self):
         if self.time_left > 0:
             self.time_left -= 1
+            self.update_label()
+        else:
+            self.reset_countdown()
+
+    def update_label(self, text=None):
+        if text:
+            # Set color to limegreen when showing "Ready"
+            self.text_label.setStyleSheet("color: limegreen; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 1px black;")
+            self.text_label.setText(text)
+        else:
+            # Set color to white during countdown
+            self.text_label.setStyleSheet("color: white; font-size: 24px; font-weight: bold; text-shadow: 1px 1px 1px black;")
             minutes = self.time_left // 60
             seconds = self.time_left % 60
-            self.label.setText(f"Undying cooldown: {minutes}:{seconds:02d}")
-        else:
-            self.timer.stop()
-            self.label.setText("Undying Ready")
+            self.text_label.setText(f"{minutes}:{seconds:02d}")
 
     # Mouse press event for dragging and right-click termination
     def mousePressEvent(self, event):
@@ -85,17 +115,14 @@ class Overlay(QWidget):
             self.drag_start_position = event.globalPos() - self.frameGeometry().topLeft()
             event.accept()
         elif event.button() == Qt.RightButton:
-            # Close the overlay before quitting
-            self.close()  # Close the overlay window
-            QApplication.quit()  # Exit the application
+            self.close()
+            QApplication.quit()
 
-    # Mouse move event for dragging
     def mouseMoveEvent(self, event):
         if self.is_dragging:
             self.move(event.globalPos() - self.drag_start_position)
             event.accept()
 
-    # Mouse release event to stop dragging
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.is_dragging = False
@@ -113,23 +140,20 @@ class UserSelectionDialog(QDialog):
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         # Set a reasonable fixed size for the window
-        self.setFixedSize(350, 150)  # (Width, Height)
+        self.setFixedSize(350, 150)
 
         # Layout
         layout = QVBoxLayout()
 
         if users:
-            # Create a dropdown (QComboBox) for users
             self.combo = QComboBox(self)
             self.combo.addItems(users)
             layout.addWidget(self.combo)
 
-            # Button to confirm selection
             self.button = QPushButton("Confirm", self)
-            self.button.clicked.connect(self.accept)  # Close dialog on button press
+            self.button.clicked.connect(self.accept)
             layout.addWidget(self.button)
         else:
-            # Display message about missing plugin if no users found
             self.message_label = QLabel(self)
             self.message_label.setText(
                 "No user folders found.\nPlease ensure that the 'Chat Logger' plugin is installed\n"
@@ -137,9 +161,8 @@ class UserSelectionDialog(QDialog):
             )
             layout.addWidget(self.message_label)
 
-            # Button to close dialog
             self.button = QPushButton("Close", self)
-            self.button.clicked.connect(self.reject)  # Close dialog on button press
+            self.button.clicked.connect(self.reject)
             layout.addWidget(self.button)
 
         self.setLayout(layout)
@@ -150,41 +173,31 @@ def get_users_folder():
     home_directory = os.path.expanduser("~")  # User's home directory
     log_base_path = os.path.join(home_directory, ".relicrsps", "chatlogs")
 
-    # Check if the base path exists
     if not os.path.exists(log_base_path):
         raise FileNotFoundError(f"Log directory not found at {log_base_path}")
 
-    # List directories in the log base path (these are the usernames)
     users = [folder for folder in os.listdir(log_base_path) if os.path.isdir(os.path.join(log_base_path, folder))]
     return log_base_path, users
 
 
 def monitor_log_file(file_path, overlay):
     with open(file_path, 'r') as file:
-        # Move to the end of the file
         file.seek(0, 2)
 
         while True:
             line = file.readline()
             if line:
                 if TARGET_STRING in line:
-                    # Emit signal to start the timer in the main thread
                     overlay.start_timer_signal.emit(180)  # 3-minute countdown
                 elif RESET_STRING in line:
-                    # Emit signal to reset the timer in the main thread
-                    print("Resetting cooldown due to relic reset message.")
-                    overlay.reset_timer_signal.emit()  # Use signal to reset timer
-            time.sleep(0.1)  # Small delay to prevent CPU overuse
+                    overlay.reset_timer_signal.emit()
+            time.sleep(0.1)
 
 
 def main():
-    # Get the users folder and list of usernames
     log_base_path, users = get_users_folder()
 
-    # Initialize the QApplication
     app = QApplication(sys.argv)
-
-    # Prompt the user to select a username
     user_dialog = UserSelectionDialog(users)
 
     if user_dialog.exec_() == QDialog.Accepted and users:
@@ -194,16 +207,12 @@ def main():
         print("No users found or selection canceled.")
         return
 
-    # Create the overlay and start the monitoring for the selected user
     overlay = Overlay()
     overlay.show()
 
-    # Construct the log path for the selected user
     log_file_path = os.path.join(log_base_path, selected_user, "game", "latest.log")
-
-    # Start monitoring the log file in a separate thread
     monitor_thread = threading.Thread(target=monitor_log_file, args=(log_file_path, overlay))
-    monitor_thread.daemon = True  # Daemon thread so it exits with the main program
+    monitor_thread.daemon = True
     monitor_thread.start()
 
     sys.exit(app.exec_())
