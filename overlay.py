@@ -21,6 +21,14 @@ from PyQt5.QtWidgets import (
 TARGET_STRING = "Your Undying Retribution Relic saves your life. The Relic has lost power for 3 minutes."
 RESET_STRING = "Your Undying Retribution relic is now ready."  # String that resets the cooldown
 
+def resource_path(relative_path):
+    """ Get the absolute path to the resource (works for PyInstaller). """
+    if hasattr(sys, '_MEIPASS'):
+        # If running in a PyInstaller bundle, look in the _MEIPASS folder
+        return os.path.join(sys._MEIPASS, relative_path)
+    else:
+        # If running as a script, use the current directory
+        return os.path.join(os.path.abspath("."), relative_path)
 
 class Overlay(QWidget):
     start_timer_signal = pyqtSignal(int)  # Signal to start the timer from another thread
@@ -35,7 +43,7 @@ class Overlay(QWidget):
         # Use absolute positioning to overlap text and image
         self.image_label = QLabel("Ready", self)
         self.image_label.setGeometry(0, 0, 68, 68)  # Set the size of the image label
-        pixmap = QPixmap("undyingimg.png")  # Replace with the actual path to the rune image
+        pixmap = QPixmap(resource_path("undyingimg.png"))
         self.image_label.setPixmap(pixmap)
         self.image_label.setScaledContents(True)
         self.image_label.setStyleSheet("background-color: rgba(79, 75, 71, 170); border: 4px solid #40372F; border-radius: 4px;")

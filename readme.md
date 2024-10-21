@@ -82,7 +82,7 @@ If you wish to build the standalone executable from source, you can use **PyInst
 
 2. Build the executable:
    ```bash
-   pyinstaller --onefile --windowed --name UndyingOverlay.exe overlay.py
+   pyinstaller --onefile -i "icon.ico" --windowed --add-data="undyingimg.png;." --name UndyingOverlay .\overlay.py
    ```
 
 The resulting executable will be in the `dist/` directory.
